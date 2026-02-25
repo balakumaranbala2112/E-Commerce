@@ -1,8 +1,12 @@
 import app from "./app.js";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+dotenv.config({ path: path.join(__dirname, "config/.env") });
 import { connectDB } from "./config/db.js";
 
-dotenv.config({ path: "backend/config/.env" });
 const PORT = process.env.PORT || 3000;
 
 connectDB();
