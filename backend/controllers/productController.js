@@ -4,6 +4,7 @@ import APIhelper from "../helper/APIhelper.js";
 
 //Add Product
 export const addProducts = async (req, res) => {
+  req.body.user = req.user.id;
   const product = await Product.create(req.body);
   res.status(201).json({ success: true, product });
 };
@@ -82,4 +83,100 @@ export const deleteProduct = async (req, res, next) => {
     return next(new errorHandler("Product Not Found", 404));
   }
   res.status(200).json({ success: true, message: "Product deleted success" });
+};
+
+export const createProductReview = async (req, res, next) => {
+  const { rating, comment, productId } = req.body;
+  const review = {
+    user: req.user._id,
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+  };
+  const product = await Product.findById(productId);
+  if (!product) {
+    return next(new errorHandler("Product Not Found", 404));
+  }
+
+  const reviewExists = product.reviews.find(
+    (review) => review.user.toString() === req.user.id,
+  );
+
+  if (reviewExists) {
+    product.reviews.forEach((review) => {
+      if (review.user.toString() === req.user.id) {
+        review.rating = rating;
+        review.comment = comment;
+      }
+    });
+  } else {
+    product.reviews.push(review);
+  }
+
+  product.numOfReviews = product.reviews.length;
+
+  let sum = 0;
+  product.reviews.forEach((review) => {
+    sum = sum + review.rating;
+  });
+
+  product.ratings =
+    product.reviews.length > 0 ? sum / product.reviews.length : 0;
+
+  await product.save({ validateBeforeSave: false });
+  res.status(200).json({ success: true, product });
+};
+
+export const viewProductReviews = async (req, res, next) => {
+  const product = await Product.findById(req.query.id);
+  if (!product) {
+    return next(new errorHandler("Product Not Found", 404));
+  }
+  res.status(200).json({ success: true, reviews: product.reviews });
+};
+
+//Admin View All Products
+
+export const getAllProductsByAdmin = async (req, res) => {
+  const products = await Product.find();
+
+  res.status(200).json({
+    success: true,
+    products,
+  });
+};
+
+export const adminDeleteReview = async (req, res, next) => {
+  const product = await Product.findById(req.query.productId);
+  if (!product) {
+    return next(new errorHandler("Product Not Found", 404));
+  }
+  const reviews = product.reviews.filter(
+    (review) => review._id.toString() !== req.query.id.toString(),
+  );
+  console.log("Before:", product.reviews.length, "After:", reviews.length);
+
+  let sum = 0;
+  reviews.forEach((review) => {
+    sum = sum + review.rating;
+  });
+
+  const ratings = reviews.length > 0 ? sum / reviews.length : 0;
+  const numOfReviews = reviews.length;
+
+  // ✅ FIX — use $set so MongoDB explicitly replaces the fields
+  await Product.findByIdAndUpdate(
+    req.query.productId,
+    {
+      $set: {
+        reviews,
+        ratings,
+        numOfReviews,
+      },
+    },
+    { new: true, runValidators: true },
+  );
+  res
+    .status(200)
+    .json({ success: true, message: "Review Deleted successfully" });
 };
