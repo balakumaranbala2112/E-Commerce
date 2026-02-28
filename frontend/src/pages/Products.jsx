@@ -119,7 +119,7 @@ const Products = () => {
                   No products found
                 </p>
                 <p className="text-xs text-stone-400">
-                  Try selecting a different category
+                  Try selecting a different categories
                 </p>
               </div>
             )}
