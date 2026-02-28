@@ -12,7 +12,9 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@reduxjs/toolkit": "^2.11.2",
     "@tailwindcss/vite": "^4.2.1",
+    "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "crypto": "^1.0.1",
@@ -24,6 +26,7 @@
     "nodemailer": "^8.0.1",
     "nodemon": "^3.1.14",
     "react-hot-toast": "^2.6.0",
+    "react-redux": "^9.2.0",
     "react-router": "^7.13.1",
     "tailwindcss": "^4.2.1",
     "validator": "^13.15.26"

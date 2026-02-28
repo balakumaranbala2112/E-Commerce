@@ -11,7 +11,7 @@ export const addProducts = async (req, res) => {
 
 export const getAllProducts = async (req, res, next) => {
   try {
-    const resultPerPage = 4;
+    const resultPerPage = 8;
 
     const apiHelper = new APIhelper(
       Product.find().sort({ createdAt: 1 }),
@@ -90,6 +90,7 @@ export const createProductReview = async (req, res, next) => {
   const review = {
     user: req.user._id,
     name: req.user.name,
+    avatar: req.user.avatar.url,
     rating: Number(rating),
     comment,
   };

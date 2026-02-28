@@ -11,6 +11,7 @@ const NAV_LINKS = [
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const isAuthenticated = false;
   const cartCount = 6;
 
@@ -44,18 +45,21 @@ const Navbar = () => {
         {/* Right Section */}
         <div className="flex items-center gap-3">
           {/* Search */}
-          <div className="hidden sm:flex items-center gap-2 bg-gray-100 hover:bg-gray-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500 focus-within:shadow-sm rounded-full px-3 py-2 transition-all duration-200 w-44 focus-within:w-56">
+          <form className="hidden sm:flex items-center gap-2 bg-gray-100 hover:bg-gray-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500 focus-within:shadow-sm rounded-full px-3 py-2 transition-all duration-200 w-44 focus-within:w-56">
             <Search
               size={15}
               className="text-gray-400 shrink-0"
               strokeWidth={2.5}
+              type="submit"
+              on
             />
             <input
               type="search"
               placeholder="Search..."
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none w-full"
             />
-          </div>
+          </form>
 
           {/* Divider */}
           <div className="hidden sm:block h-6 w-px bg-gray-200" />
@@ -118,7 +122,7 @@ const Navbar = () => {
           ))}
 
           {/* Mobile Search */}
-          <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2 mt-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:bg-white transition-all duration-200">
+          <form className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-2 mt-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:bg-white transition-all duration-200">
             <Search
               size={15}
               className="text-gray-400 shrink-0"
@@ -129,7 +133,7 @@ const Navbar = () => {
               placeholder="Search products..."
               className="bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none w-full"
             />
-          </div>
+          </form>
 
           {!isAuthenticated && (
             <Link

@@ -1,6 +1,7 @@
 import { ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router";
 import Rating from "./Rating";
+import { useState } from "react";
 
 const Product = ({ product }) => {
   const discount = product.originalPrice
@@ -8,8 +9,9 @@ const Product = ({ product }) => {
         ((product.originalPrice - product.price) / product.originalPrice) * 100,
       )
     : null;
-
+  const [rating, setRating] = useState(product.ratings || 0);
   return (
+    
     <div className="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 overflow-hidden transition-all duration-300 flex flex-col">
       {/* Image */}
       <Link
@@ -53,7 +55,7 @@ const Product = ({ product }) => {
 
         {/* Rating */}
         <div className="flex items-center gap-2">
-          <Rating />
+          <Rating value={rating} onRatingChange={(r) => setRating(r)} />
           <span className="text-xs text-gray-400">
             ({product.numOfReviews} reviews)
           </span>
