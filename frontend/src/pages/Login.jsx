@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Mail, Lock, User, Eye, EyeOff, Loader2, ShoppingBag } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Loader2, ShoppingBag } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { register, clearErrors } from "../features/user/userSlice";
+import { login, clearErrors } from "../features/user/userSlice";
 import toast from "react-hot-toast";
 import PageTitle from "../components/PageTitle";
 
-const Register = () => {
+const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
   const { loading, error, isAuthenticated } = useSelector((state) => state.user);
 
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // If coming from checkout, redirect back to shipping, otherwise home
   const redirect = location.search ? location.search.split("=")[1] : "/";
 
   useEffect(() => {
@@ -32,20 +32,16 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !email || !password) {
+    if (!email || !password) {
       toast.error("Please fill in all fields");
       return;
     }
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters");
-      return;
-    }
-    dispatch(register({ name, email, password }));
+    dispatch(login({ email, password }));
   };
 
   return (
     <>
-      <PageTitle title="Register | ShoppingHUB" />
+      <PageTitle title="Login | ShoppingHUB" />
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 via-blue-50/20 to-stone-100 px-4 py-12">
         <div className="w-full max-w-md bg-white rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.06)] border border-gray-100 p-8 flex flex-col gap-6 relative overflow-hidden">
           {/* Header Brand */}
@@ -56,28 +52,12 @@ const Register = () => {
               </span>
               Shopping<span className="text-blue-600">HUB</span>
             </Link>
-            <h2 className="text-xl font-bold text-gray-900 mt-2">Create Account</h2>
-            <p className="text-sm text-gray-400">Join ShoppingHUB and start exploring the premium collection.</p>
+            <h2 className="text-xl font-bold text-gray-900 mt-2">Welcome Back!</h2>
+            <p className="text-sm text-gray-400">Please sign in to your account to continue shopping.</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {/* Full Name */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Full Name</label>
-              <div className="relative flex items-center bg-gray-50 hover:bg-gray-100/70 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500 rounded-2xl px-4 py-3.5 border border-gray-100 focus-within:border-transparent transition-all duration-200">
-                <User className="w-4 h-4 text-gray-400 shrink-0 mr-3" />
-                <input
-                  type="text"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="bg-transparent text-sm text-gray-800 placeholder-gray-300 outline-none w-full font-medium"
-                  required
-                />
-              </div>
-            </div>
-
             {/* Email Field */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Address</label>
@@ -96,12 +76,17 @@ const Register = () => {
 
             {/* Password Field */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Password</label>
+              <div className="flex justify-between items-center">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Password</label>
+                <Link to="/password/forgot" className="text-xs text-blue-600 hover:underline font-medium">
+                  Forgot Password?
+                </Link>
+              </div>
               <div className="relative flex items-center bg-gray-50 hover:bg-gray-100/70 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500 rounded-2xl px-4 py-3.5 border border-gray-100 focus-within:border-transparent transition-all duration-200">
                 <Lock className="w-4 h-4 text-gray-400 shrink-0 mr-3" />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="•••••••• (min 8 chars)"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="bg-transparent text-sm text-gray-800 placeholder-gray-300 outline-none w-full font-medium"
@@ -126,19 +111,19 @@ const Register = () => {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Creating Account...
+                  Signing In...
                 </>
               ) : (
-                "Create Account"
+                "Sign In"
               )}
             </button>
           </form>
 
-          {/* Login Redirect */}
+          {/* Register Redirect */}
           <div className="text-center text-sm text-gray-400">
-            Already have an account?{" "}
-            <Link to={`/login?redirect=${redirect}`} className="text-blue-600 hover:underline font-semibold">
-              Sign In
+            Don't have an account?{" "}
+            <Link to={`/register?redirect=${redirect}`} className="text-blue-600 hover:underline font-semibold">
+              Create Account
             </Link>
           </div>
         </div>
@@ -147,4 +132,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;

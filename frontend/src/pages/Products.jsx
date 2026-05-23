@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { Loader2, SlidersHorizontal, PackageSearch } from "lucide-react";
 import Product from "../components/Product";
 import Pagination from "../components/Pagination";
+import { useSearchParams } from "react-router-dom";
 
 const categories = ["All", "Phone", "Laptop", "Books", "Stationery"];
 
@@ -15,14 +16,19 @@ const Products = () => {
     (state) => state.product,
   );
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const keyword = searchParams.get("keyword") || "";
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [category, setCategory] = useState("All");
 
   useEffect(() => {
-    dispatch(getProduct());
-  }, [dispatch]);
+    dispatch(getProduct({ keyword, page: currentPage, category }));
+  }, [dispatch, keyword, currentPage, category]);
 
   useEffect(() => {
     if (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Failed to load products");
       dispatch(removeErrors());
     }
   }, [dispatch, error]);
@@ -54,7 +60,9 @@ const Products = () => {
           <p className="text-xs tracking-[0.2em] uppercase text-amber-600 font-semibold mb-1">
             Explore
           </p>
-          <h1 className="text-3xl font-bold text-stone-900">All Products</h1>
+          <h1 className="text-3xl font-bold text-stone-900">
+            {keyword ? `Search Results for "${keyword}"` : "All Products"}
+          </h1>
         </div>
 
         <div className="flex gap-8 items-start">
@@ -70,7 +78,17 @@ const Products = () => {
               <ul className="space-y-1">
                 {categories.map((cat) => (
                   <li key={cat}>
-                    <button className="w-full text-left px-3 py-2.5 rounded-xl text-sm text-stone-600 font-medium hover:bg-stone-100 hover:text-stone-900 transition-all duration-150 first-of-type:bg-stone-900 first-of-type:text-white">
+                    <button
+                      onClick={() => {
+                        setCategory(cat);
+                        setCurrentPage(1);
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+                        category === cat
+                          ? "bg-stone-900 text-white"
+                          : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+                      }`}
+                    >
                       {cat}
                     </button>
                   </li>
@@ -94,7 +112,15 @@ const Products = () => {
                 {categories.map((cat) => (
                   <button
                     key={cat}
-                    className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-stone-200 text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all duration-150"
+                    onClick={() => {
+                      setCategory(cat);
+                      setCurrentPage(1);
+                    }}
+                    className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 ${
+                      category === cat
+                        ? "bg-stone-900 text-white border-stone-900"
+                        : "bg-white border-stone-200 text-stone-600 hover:bg-stone-900 hover:text-white hover:border-stone-900"
+                    }`}
                   >
                     {cat}
                   </button>
@@ -119,7 +145,7 @@ const Products = () => {
                   No products found
                 </p>
                 <p className="text-xs text-stone-400">
-                  Try selecting a different categories
+                  Try selecting a different category or search term
                 </p>
               </div>
             )}
@@ -127,7 +153,12 @@ const Products = () => {
             {/* Pagination */}
             {products && products.length > 0 && (
               <div className="mt-10 flex justify-center">
-                <Pagination />
+                <Pagination
+                  activePage={currentPage}
+                  itemsCountPerPage={8}
+                  totalItemsCount={productCount}
+                  onChange={(page) => setCurrentPage(page)}
+                />
               </div>
             )}
           </section>

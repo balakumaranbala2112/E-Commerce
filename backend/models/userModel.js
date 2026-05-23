@@ -69,4 +69,4 @@ userSchema.methods.createPasswordResetToken = function () {
   return restToken;
 };
 
-export default mongoose.model(" ", userSchema);
+export default mongoose.model("User", userSchema);
